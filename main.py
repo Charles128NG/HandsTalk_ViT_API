@@ -6,6 +6,8 @@ from fastapi import FastAPI, File, UploadFile
 from PIL import Image
 from transformers import ViTForImageClassification, ViTFeatureExtractor
 import gesture
+from fastapi.middleware.cors import CORSMiddleware
+
 
 Gesture_dict = gesture.Gesture_dict
 
@@ -19,6 +21,15 @@ feature_extractor = ViTFeatureExtractor.from_pretrained(path)
 
 app = FastAPI()
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 def prepare_image(image):
     image = Image.open(io.BytesIO(image))
     inputs = feature_extractor(image, return_tensors='pt')
@@ -27,7 +38,7 @@ def prepare_image(image):
 
 
 # Define the endpoint
-
+print("succesfully reached pint till post request need to be made")
 @app.post("/predict")
 async def predict(image: UploadFile = File(...)):
     contents = await image.read()
